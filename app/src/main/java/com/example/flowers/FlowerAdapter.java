@@ -1,53 +1,66 @@
 package com.example.flowers;
 
+import android.content.Context;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
-public class FlowerAdapter extends RecyclerView.Adapter<FlowerAdapter.ViewHolder> {
-    private List<Flowers> mFlowers;
+class FlowerAdapter extends RecyclerView.Adapter<FlowerAdapter.ViewHolder> {
 
-    FlowerAdapter(List<Flowers> posts) {
-        this.mFlowers = posts;
+    private final static String PHOTO_URL = "https://services.hanselandpetal.com/photos/";
+    private List<Flowers> mFlowers;
+    private Context mContext;
+
+    FlowerAdapter(List<Flowers> flowers) {
+        this.mFlowers = flowers;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_flowers, parent,
-                false);
-        return new ViewHolder(v);
+        mContext = parent.getContext();
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.list_flowers, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Flowers post = mFlowers.get(position);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            holder.postTextView.setText(Html.fromHtml(post.toString(), Html
-                    .FROM_HTML_MODE_LEGACY));
-        } else {
-            holder.postTextView.setText(Html.fromHtml(post.toString()));
-        }
+
+        Flowers flower = mFlowers.get(position);
+        holder.nameTextView.setText(flower.getName());
+
+        Picasso.with(mContext)
+                .load(PHOTO_URL + flower.getPhoto())
+                .resize(200, 150)
+                .into(holder.flowerImageView);
     }
 
     @Override
     public int getItemCount() {
-        if (mFlowers == null)
+        if (mFlowers == null) {
             return 0;
+        }
         return mFlowers.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView postTextView;
+        TextView nameTextView;
+        ImageView flowerImageView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            postTextView =  itemView.findViewById(R.id.textView_item_post);
+            nameTextView = (TextView) itemView.findViewById(R.id.nameTextView);
+            flowerImageView = (ImageView) itemView.findViewById(R.id.itemImageView);
         }
-    }}
+    }
+}
